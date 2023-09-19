@@ -1,6 +1,12 @@
 <?php
-
+use App\Http\Controllers\CekRoleController;
+use App\Http\Controllers\Peminjam\BukuController as PeminjamBukuController;
+use App\Http\Controllers\Petugas\KategoriController;
+use App\Http\Controllers\Petugas\RakController;
+use App\Http\Controllers\Petugas\PenerbitController;
+use App\Http\Controllers\Petugas\BukuController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +19,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', PeminjamBukuController::class);
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/cek-role', CekRoleController::class)->middleware('auth');
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('auth');
+
+Route::middleware(['auth', 'role:admin|petugas'])->group(function () {
+
+    Route::get('/dashboard', function () {
+    return view('petugas/dashboard');
+    });
+
+    Route::get('/kategori', KategoriController::class);
+    Route::get('/rak', RakController::class);
+    Route::get('/penerbit', PenerbitController::class);
+    Route::get('/buku', BukuController::class);
+});
